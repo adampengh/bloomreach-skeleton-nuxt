@@ -16,24 +16,44 @@ limitations under the License.
 
 <template>
   <div class="mb-3">
-    BrContainers
-    <!-- <div :v-for="(container, index) in containers" :key="index">
-
-    </div> -->
+    <div v-for="(container, index) in containers" :key="index">
+      <UCard :ui="{
+        base: 'mb-3',
+        background: 'bg-white dark:bg-gray-900',
+        divide: 'divide-slate-300 dark:divide-slate-200',
+        ring: 'ring-1 ring-gray-200 dark:ring-gray-800',
+        rounded: '',
+        shadow: 'shadow',
+        header: {
+          base: '',
+          background: 'bg-primary-500',
+          padding: 'p-2'
+        },
+        body: {
+          base: '',
+          background: '',
+          padding: 'p-2'
+        },
+      }">
+        <template #header >
+          <h1 class="text-xl text-white font-bold">{{ container.path }}</h1>
+        </template>
+        <br-component :component="container.path" />
+      </UCard>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import type { Page } from '@bloomreach/spa-sdk';
+  import { isComponent, isContainer, isContainerItem, type Page } from '@bloomreach/spa-sdk';
+  import { BrComponent, BrPage } from '@bloomreach/vue-sdk';
   import { defineProps } from 'vue';
 
   const props = defineProps<{
     page: Page
   }>();
 
-  const page = props.page;
-
-  const containers = page.getComponent().getChildren();
-  console.log('containers', containers)
-
+  const containers = flatten(props.page.getComponent().getChildren())
+    .filter(value => value.type === 'container');
+  console.log('containers', containers);
 </script>

@@ -28,29 +28,20 @@ type ConfigurationBuilder = Configuration & Partial<BuildConfigurationOptions>;
 export function buildConfiguration(
     path: string,
     httpClient: Configuration['httpClient'],
-    baseUrl: string,
     endpoint: string,
-    hasMultiTenantSupport: boolean,
 ): Configuration {
   const configuration: Partial<ConfigurationBuilder> = {
     path,
   };
-  configuration.baseUrl = baseUrl;
-  if (endpoint) {
-    configuration.endpoint = endpoint;
-    // The else statement below is needed for multi-tenant support
-    // It allows operating the same Reference SPA for different channels in EM using endpoint query parameter in the URL
-    // It's used mainly by BloomReach and is not needed for most customers
-  } else if (hasMultiTenantSupport) {
-    const endpointQueryParameter = 'endpoint';
-    const { url, searchParams } = extractSearchParams(path, [endpointQueryParameter].filter(Boolean));
 
-    configuration.endpoint = searchParams.get(endpointQueryParameter) ?? '';
-    configuration.baseUrl = `?${endpointQueryParameter}=${searchParams.get(endpointQueryParameter)}`;
-    configuration.path = url;
-  }
+  const endpointQueryParameter = 'endpoint';
+  const { url, searchParams } = extractSearchParams(path, [endpointQueryParameter].filter(Boolean));
+
+  configuration.endpoint = searchParams.get(endpointQueryParameter) ?? endpoint ?? '';
+  configuration.baseUrl = `?${endpointQueryParameter}=${searchParams.get(endpointQueryParameter)}`;
+  configuration.path = url;
   configuration.httpClient = httpClient;
-
   configuration.debug = true;
+
   return configuration as Configuration;
 }

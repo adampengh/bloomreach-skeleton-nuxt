@@ -19,11 +19,9 @@ limitations under the License.
     <template v-slot="{ page }">
       <template v-if="page">
         <BrPageDetails :page="page" :configuration="configuration"/>
-        <BrContainers :page="page"/>
 
-        <!-- TODO: Loop over components manually -->
         <section class="container flex-fill pt-3">
-          <br-component component="main"/>
+          <BrContainers :page="page" />
         </section>
       </template>
     </template>
@@ -36,16 +34,14 @@ import { BrComponent, BrPage } from '@bloomreach/vue-sdk';
 import { initialize } from '@bloomreach/spa-sdk';
 import { buildConfiguration } from '~/utils/buildConfiguration';
 import { brMapping } from '~/utils/brMapping';
+import { flatten } from '~/utils/flatten';
 
 const config = useRuntimeConfig();
 const route = useRoute();
 
 const endpoint = config.public.NUXT_APP_BRXM_ENDPOINT ?? '';
-const baseUrl = config.public.BASE_URL !== '/' ? config.public.BASE_URL ?? '' : '';
-const hasMultiTenantSupport = config.public.NUXT_APP_BR_MULTI_TENANT_SUPPORT === 'true';
-
 const configuration = {
-  ...buildConfiguration(`${route.fullPath}`, axios, baseUrl, endpoint, hasMultiTenantSupport),
+  ...buildConfiguration(`${route.fullPath}`, axios, endpoint),
 };
 
 const { data } = await useAsyncData(async (context) => {
